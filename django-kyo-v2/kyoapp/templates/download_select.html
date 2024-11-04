@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block headscript %}
+{% load static %}
+  <link rel="stylesheet" type="text/css" href="{% static 'kyoapp/style.css' %}" />
+{% endblock %}
+
+{% block content %}
+<div id="content">
+<div id="select-participant">
+  <h1>Select a Finished Game</h1>
+  <div class="participant-list" style="display:flex; align-items: center; flex-wrap: wrap; justify-content: space-around; max-width:600px;">
+    {% if participants %}
+      {% for game in participants %}
+        <a href="{% url 'download' game.pk %}" class="button horiz-button">{{game}}</a>
+      {% endfor %}
+    {% else %}
+      No finished games are available.
+    {% endif %}
+  </div>
+  </div>
+</div>
+{% endblock %}

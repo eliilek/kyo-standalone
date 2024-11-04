@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {% load static %}
+    {% load kyotags %}
+    {% load cloudinary %}
+    {% csrf_token %}
+    <meta charset="utf-8"/>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="{% static 'kyoapp/style.css' %}">
+    <script>
+      var game_slug = "{{game.slug}}"
+      {% if game.started %}
+      var game_started = true;
+      {% else %}
+      var game_started = false;
+      {% endif %}
+      var game_start_functions = [];
+      var results_functions = [];
+      var my_seat_number = "Admin";
+    </script>
+    <script src="{% static 'kyoapp/reconnectingWebSocket.js' %}"></script>
+    <script src="{% static 'kyoapp/manage.js' %}"></script>
+  </head>
+  <body>
+    <div id="header-div">
+      Current Cycle: <span id="total-cycle-span">{% if total_cycle %}{{total_cycle}}{% else %}Not Started{% endif %}</span> (<span id="current-condition-cycle-span">{% if current_cycle %}{{current_cycle}}{% else %}Not Started{% endif %}</span> in current condition)
+    </div>
+    <table id="choice-table">
+      <tr>
+        <th colspan={{game.choices.count}}>Choice Options</th>
+      </tr>
+      <tr>
+      {% for choice in game.choices.all %}
+        <td id="choice-{{choice.id}}" class="choice-td" data-choice-pk="{{choice.pk}}">{% cloudinary choice.image %}</td>
+      {% endfor %}
+      </tr>
+    </table>
+    <div class="flex-body">
+    <div class="manager-flex-col" id="col-1">
+    <table id="previous-cycle-table">
+      <tr>
+        <!--TODO Set colspan = player_num at start of game if not passed-->
+        <th colspan={{game.player_count}}>Previous Cycle</th>
+      </tr>
+      <tr>
+        <!--TODO Add players names on gamestart? -->
+        {% for num in game.player_count|times %}
+        <td id="previous-cycle-player-{{num|add:'1'}}">P{{num|add:"1"}}</td>
+        {% endfor %}
+      </tr>
+      <tr>
+        {% for num in game.player_count|times %}
+        <td><img id="previous-cycle-img-player-{{num|add:'1'}}" class="previous-cycle-img"></td>
+        {% endfor %}
+      </tr>
+    </table>
+    <script src="{% static 'kyoapp/previous_cycle_displayed.js' %}"></script>
+    <table id="current-cycle-table">
+      <tr>
+        <!--TODO Set colspan = player_num at start of game if not passed-->
+        <th colspan={{game.player_count}}>Current Cycle</th>
+      </tr>
+      <tr>
+        <!--TODO Add players names on gamestart -->
+        {% for num in game.player_count|times %}
+        <td id="current-cycle-player-{{num|add:'1'}}">P{{num|add:"1"}}</td>
+        {% endfor %}
+      </tr>
+      <tr>
+        {% for num in game.player_count|times %}
+        <td><img class='current-cycle-img' id="current-cycle-img-player-{{num|add:'1'}}"></td>
+        {% endfor %}
+      </tr>
+    </table>
+      <table id="points-table">
+        <tr>
+        {% for point in game.points.all %}
+          {% if point.individual %}
+            {% for num in game.player_count|times %}
+              <th id="points-header-player-{{num|add:1}}-{{point}}" class="points-header" data-instance-name="{{num|add:1}}-{{point}}" data-instance-display="P{{num|add:1}} {{point.display}}">P{{num|add:1}} {{point.display}}</th>
+            {% endfor %}
+          {% else %}
+          <th id="points-header-{{point}}" class="points-header" data-instance-name="{{point}}" data-instance-display="{{point.display}}">{{point.display}}</th>
+          {% endif %}
+        {% endfor %}
+        </tr>
+        <tr>
+          {% for point in game.points.all %}
+            {% if point.individual %}
+              {% for num in game.player_count|times %}
+                <td id="points-body-player-{{num|add:1}}-{{point}}" class="points-body" data-instance-name="{{num|add:1}}-{{point}}" data-instance-display="P{{num|add:1}} {{point.display}}">{{point.starting_value}}</td>
+              {% endfor %}
+            {% else %}
+            <td id="points-body-{{point}}" class="points-body" data-instance-name="{{point}}" data-instance-display="{{point.display}}">{{point.starting_value}}</td>
+            {% endif %}
+          {% endfor %}
+        </tr>
+      </table>
+    </div>
+    <div class="manager-flex-col" id="col-2">
+    <textarea id="chat-log" cols="100" rows="20"></textarea><br>
+    <select name="message-target" id="message-target">
+      <option value="all">All Players</option>
+      <option value="admin">Admin</option>
+      {% for num in game.player_count|times %}
+        <option value="{{num|add:1}}">Player {{num|add:1}}</option>
+      {% endfor %}
+    </select>
+    <input id="chat-message-input" type="text" size="100"><br>
+    <input id="chat-message-submit" type="button" value="Send">
+    <script src="{% static 'kyoapp/chat.js' %}"></script>
+    {% if not game.started %}
+    <button id="start-button">Start Game</button>
+    {% else %}
+    <button id="pause-button">Pause Game</button>
+    <button id="end-button">End Game</button>
+    {% endif %}
+  </div>
+  </div>
+  </body>

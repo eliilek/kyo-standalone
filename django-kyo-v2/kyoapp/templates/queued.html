@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block headscript %}
+{% load static %}
+  <link rel="stylesheet" type="text/css" href="{% static 'kyoapp/style.css' %}" />
+{% endblock %}
+
+{% block content %}
+<table>
+  <tr>
+    <th>GENERATED</th>
+    <th>FILENAME</th>
+    <th>DOWNLOAD</th>
+    <th>DELETE</th>
+  </tr>
+  {% for file in files %}
+    <tr>
+    <td>{{file.created}}</td>
+    <td>{{file.name}}</td>
+    {% if file.ready %}
+      <td><a href="{% url 'retrieve' file.name %}">Download</a></td>
+    {% else %}
+      <td>Still Loading</td>
+    {% endif %}
+    <td><a href="{% url 'delete' file.name %}" onclick="return confirm('Are you sure?')">Delete</a></td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

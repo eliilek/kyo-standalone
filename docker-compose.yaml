@@ -1,0 +1,103 @@
+# Comments are provided throughout this file to help you get started.
+# If you need more help, visit the Docker Compose reference guide at
+# https://docs.docker.com/go/compose-spec-reference/
+
+# Here the instructions define your application as a service called "server".
+# This service is built from the Dockerfile in the current directory.
+# You can add other services your application may depend on here, such as a
+# database or a cache. For examples, see the Awesome Compose repository:
+# https://github.com/docker/awesome-compose
+#version: '2'
+
+networks:
+  webnet:
+    driver: overlay
+    attachable: true # Needed in order to run custom commands in the container
+
+services:
+    nginx:
+        restart: always
+        image: nginx:1.23-alpine
+        ports:
+            - 80:80
+        volumes:
+            - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+            - static_volume:/app/kyo-backend/django_static
+    kyo-server:
+        restart: unless-stopped
+        build:
+            context: .
+            dockerfile: ./docker/kyo-backend/Dockerfile
+        entrypoint: /app/docker/kyo-backend/server-entrypoint.sh
+        volumes:
+            - static_volume:/app/kyo-backend/django_static
+        expose:
+            - 8000
+        environment:
+            DEBUG: "True"
+            REDIS_URL: 'redis://redis:6379'
+            DJANGO_DB: postgresql
+            #TODO replace with new database host info
+            POSTGRES_HOST: kleinapp-database-do-user-17842599-0.k.db.ondigitalocean.com
+            POSTGRES_NAME: kyo-db
+            POSTGRES_USER: doadmin
+            POSTGRES_PORT: 25060
+            S3_ACCESS: /run/secrets/S3_ACCESS
+            S3_SECRET: /run/secrets/S3_SECRET
+            C_URL: /run/secrets/CLOUDINARY_URL
+            POSTGRES_PASSWORD: /run/secrets/POSTGRES_PASSWORD
+        secrets:
+            - S3_ACCESS
+            - S3_SECRET
+            - CLOUDINARY_URL
+            - POSTGRES_PASSWORD
+    kyo-worker:
+        restart: unless-stopped
+        build:
+            context: .
+            dockerfile: ./docker/kyo-backend/Dockerfile
+        entrypoint: /app/docker/kyo-backend/worker-entrypoint.sh
+        volumes:
+            - static_volume:/app/kyo-backend/django_static
+        environment:
+            DEBUG: "True"
+            REDIS_URL: 'redis://redis:6379'
+            DJANGO_DB: postgresql
+            #TODO replace with new database host info
+            POSTGRES_HOST: kleinapp-database-do-user-17842599-0.k.db.ondigitalocean.com
+            POSTGRES_NAME: kyo-db
+            POSTGRES_USER: doadmin
+            POSTGRES_PORT: 25060
+            S3_ACCESS: /run/secrets/S3_ACCESS
+            S3_SECRET: /run/secrets/S3_SECRET
+            C_URL: /run/secrets/CLOUDINARY_URL
+            POSTGRES_PASSWORD: /run/secrets/POSTGRES_PASSWORD
+        depends_on:
+            - kyo-server
+            - redis
+        secrets:
+            - S3_ACCESS
+            - S3_SECRET
+            - CLOUDINARY_URL
+            - POSTGRES_PASSWORD
+    redis:
+        restart: unless-stopped
+        image: redis:7.0.5-alpine 
+        expose:
+            - 6379
+
+#TODO You will need to create/set these environment variables on your system before composing.
+#S3_ACCESS and S3_SECRET should credential access to an amazon S3 bucket to store created CSV files
+#CLOUDINARY_URL allows using cloudinary to store uploaded images. POSTGRES_PASSWORD is hopefully self explanatory.
+secrets:
+    S3_ACCESS:
+        environment: S3_ACCESS
+    S3_SECRET:
+        environment: S3_SECRET
+    CLOUDINARY_URL:
+        environment: CLOUDINARY_URL
+    POSTGRES_PASSWORD:
+        environment: POSTGRES_PASSWORD
+
+volumes:
+    static_volume: {}

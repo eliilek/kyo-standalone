@@ -1,0 +1,26 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+dj-database-url = "*"
+Django = "*"
+django-heroku = "*"
+gunicorn = "*"
+psycopg2 = "*"
+pytz = "*"
+whitenoise = "*"
+setuptools = "*"
+cloudinary = "*"
+channels-redis = "*"
+django-rq = "*"
+redis = "*"
+django-storages = "*"
+boto3 = "*"
+daphne = "*"
+
+[requires]
+python_version = "3.12"

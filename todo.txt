@@ -1,0 +1,11 @@
+In docker-compose.yaml:
+	-Update environment variables under kyo-server and kyo-worker to point to new database
+	-See TODO note at bottom regarding creating environment variables to provide system secrets at runtime
+
+In docker/nginx/default.conf:
+	-Update server_name to match your URL. Optionally delete the "server_name" line, delete the server block at the bottom that returns 204, and replace "listen 80;" with "listen 80 default_server;" to not check domain header.
+
+In django-kyo-v2/project/settings.py:
+	-Add an environment variable called "DJANGO_SECRET_KEY" and/or change the default key on line 19
+	-Change the timezone on line 141 if desired
+	-Edit AWS_STORAGE_BUCKET_NAME and AWS_S3_REGION_NAME below line 170 to match new S3 file storage bucket

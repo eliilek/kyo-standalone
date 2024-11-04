@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block headscript %}
+{% load static %}
+<script src="{% static 'kyoapp/reconnectingWebSocket.js' %}"></script>
+	<script>
+		var known_games = {};
+		var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
+		const superSocket = new ReconnectingWebSocket(
+            ws_scheme
+            + '://'
+            + window.location.host
+            + '/ws/super/'
+            );
+		function refresh(){
+			superSocket.send(JSON.stringify({'refresh':true}));
+			$("h2").html("Manage Games");
+   		setTimeout(refresh, 15000);
+		}
+   superSocket.onopen = refresh
+      superSocket.onmessage = function(e){
+        const data = JSON.parse(e.data);
+        for (key in data){
+        	if (!(data[key]['slug'] in known_games)){
+        		var new_row = $("<tr id=" + data[key]['slug'] + "></tr>");
+        		var new_slug_td = $("<td class='slug-td'></td>");
+        		var new_slug_a = $("<a></a>").attr('href', "game/" + data[key]['slug']).html(data[key]['slug']);
+        		var new_name_td = $("<td class='name-td'></td>").html(data[key]['name']);
+        		var new_player_td = $("<td class='player-td'></td>");
+        		new_row.append(new_name_td);
+        		new_row.append(new_player_td);
+        		new_row.append(new_slug_td);
+        		$("#game-table").append(new_row);
+        		new_slug_td.append(new_slug_a);
+        	}
+        	known_games[data[key]['slug']] = true;
+        	//$("#"+data[key]['slug']+" td.slug-td").html(data[key]['slug']);
+        	//$("#"+data[key]['slug']+" td.name-td").html(data[key]['name']);
+        	$("#"+data[key]['slug']+" td.player-td").html(data[key]['current_players'].toString() + "/" + data[key]['max_players'].toString());
+        }
+        for (slug in known_games){
+        	if (known_games[slug]){
+        		known_games[slug] = false;
+        	} else {
+        		delete known_games[slug];
+        		$("#" + slug).remove();
+        	}
+        }
+    }
+
+      superSocket.onclose = function(e){
+   console.log("Socket closed unexpectedly.");
+   $("h2").html("Socket disconnected, games will not update. Please refresh the page.")
+   }
+
+	</script>
+{% endblock %}
+{% block content %}
+	<div id="participant-select">
+		<h1>Select an Action</h1>
+		<div class="participant-list">
+			<a href="{% url 'download_select' %}" class="button">Download Data</a>
+			<a href="{% url 'admin:index' %}" class="button">Create/Modify Games</a>
+		</div>
+	</div>
+	<div id="game-select">
+		<h2>Manage Games</h2>
+		<table class="game-list" id="game-table">
+			<tr>
+				<th>Game Name</th>
+				<th>Players Seated</th>
+				<th>Slug (connection code)</th>
+			</tr>
+		</table>
+	</div>
+{% endblock %}

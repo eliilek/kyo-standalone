@@ -1,0 +1,116 @@
+.selected-choice {
+	border: solid 5px black;
+}
+table{
+	border: solid 1px black;
+	min-width: 100%;
+}
+tr{
+	border: solid 1px black;
+}
+td{
+	border: solid 1px black;
+	text-align: center;
+}
+img{
+	width: 8vw;
+	height: 8vw;
+	max-width: 155px;
+	min-width: 100px;
+	max-height: 155px;
+	min-height: 100px;
+}
+div{
+	background-color: white;
+}
+.flex-body{
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 10px;
+	height: 90%;
+}
+.flex-col{
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
+	width: 35%;
+	border: black 1px solid;
+}
+.manager-flex-col{
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
+	flex-grow: 1;
+	border: black 1px solid;
+}
+#col-1{
+	gap: 40px;
+	margin: 20px;
+}
+
+#banner-div{
+	text-align: center;
+	width: 100%;
+	background-color: lightgrey;
+}
+#chat-div{
+	display: flex;
+	flex-direction: column;
+	max-height: 85%;
+}
+#top-cols-div{
+	display: flex;
+	flex-direction: row;
+	width: 100%;
+	justify-content: space-evenly;
+	align-items: center;
+}
+#choice-table-div{
+	display: flex;
+	align-items: center;
+	justify-content: space-around;
+	width: 100%;
+}
+.chat-send-row-div{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 50%;
+	width: 100%;
+}
+#chat-col-2-container-div{
+	width: 50%;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+#chat-message-input{
+	width: 100%;
+}
+.instructions-div{
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	height: 100%;
+	gap: 20px;
+}
+.not-turn{
+	opacity: .5;
+}
+#header-div{
+	background-color: lightgrey;
+	width: 100%;
+}
+.button {
+  background-color: #993685;
+  color: white;
+  border: 3px solid #993685;
+  font-size: 24px;
+  text-decoration: none;
+  padding: 8px 24px;
+  border-radius: 3px;
+  transition: .3s all ease-in-out; }
+  .button:hover {
+    background-color: white;
+    color: #993685; }

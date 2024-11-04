@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+	{% if error %}
+		<p>That didn't look quite right. Double check the code and try again, or contact your experimenter.</p>
+	{% endif %}
+	<form action="{% url 'join' %}" method="post">
+		{% csrf_token %}
+		<input name="slug" id="slug" type="text">
+		<label for="slug">Enter your game code here</label><br>
+		<input name="seat" id="seat" type="number">
+		<label for="seat">(Optional)Enter the seat number you were given</label>
+		<input type="submit" value="Join Game!">
+	</form>
+{% endblock %}
