@@ -21,5 +21,6 @@ python manage.py collectstatic --noinput
 export CLOUDINARY_URL=$(cat /run/secrets/CLOUDINARY_URL)
 export S3_ACCESS=$(cat /run/secrets/S3_ACCESS)
 export S3_SECRET=$(cat /run/secrets/S3_SECRET)
+export POSTGRES_PASSWORD=$(cat /run/secrets/POSTGRES_PASSWORD)
 
 daphne -b 0.0.0.0 -p 8000 project.asgi:application
